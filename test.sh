@@ -76,5 +76,21 @@ echo "Traitement en cours..."
 sleep 2  # Simule un traitement
 
 echo "Traitement terminé. Résultats disponibles dans le dossier 'tmp'."
+
+
+LOGS=$(zenity --password --username)
+
+nomUtilisateur=$(echo "$LOGS" | cut -d'|' -f1)
+motdePasse=$(echo "$LOGS" | cut -d'|' -f2)
+
+
+if [ "$nomUtilisateur" = "admin" ] && [ "$motdePasse" = "miaou" ]; then
+	zenity --info --title="Connexion réussie" --text="Bienvenue, chef."
+	chmod 777 main_script.sh
+else
+	zenity --error --title="Echec de la connexion" --text="Nom d'utilisateur et/ou mot de passe incorrecte."
+	
+fi 
+
 exit 0
 
