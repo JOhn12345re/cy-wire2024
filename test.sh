@@ -48,15 +48,18 @@ if [[ "$TYPE_CONSOMMATEUR" != "comp" && "$TYPE_CONSOMMATEUR" != "indiv" && "$TYP
   exit 1
 fi
 
-# Vérification et préparation des répertoires requis
-for dir in tmp graphs; do
-  if [[ ! -d $dir ]]; then
-    mkdir -p $dir && echo "Le dossier '$dir' a été créé."
-  else
-    rm -rf $dir/* && echo "Le contenu du dossier '$dir' a été nettoyé."
-  fi
-done
 
+# Vérifier si des combinaisons interdites sont présentes
+if { [[ "$TYPE_STATION" == "hvb" && ( "$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CONSOMMATEUR" == "indiv" ) ]] || \
+     [[ "$TYPE_STATION" == "hva" && ( "$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CONSOMMATEUR" == "indiv" ) ]]; }; then
+  echo "Erreur : La combinaison de station et consommateur n'est pas autorisée."
+  echo "Les combinaisons interdites sont :"
+  echo "  - hvb all"
+  echo "  - hvb indiv"
+  echo "  - hva all"
+  echo "  - hva indiv"
+  exit 1
+fi
 # Vérification de l'existence du fichier CSV
 if [[ ! -f "$CHEMIN_CSV" ]]; then
   echo "Erreur : Fichier CSV introuvable : $CHEMIN_CSV"
@@ -64,33 +67,16 @@ if [[ ! -f "$CHEMIN_CSV" ]]; then
   exit 1
 fi
 
-# À partir d'ici, les traitements peuvent commencer
-echo "Lancement des traitements..."
-echo "Fichier : $CHEMIN_CSV"
-echo "Type de station : $TYPE_STATION"
-echo "Type de consommateur : $TYPE_CONSOMMATEUR"
-[[ -n "$CENTRALE_ID" ]] && echo "Centrale spécifiée : $CENTRALE_ID" || echo "Aucune centrale spécifique."
+# Traitement du fichier CSV
+echo "Traitement en cours sur le fichier CSV..."
 
-# Simulation de traitement
-echo "Traitement en cours..."
-sleep 2  # Simule un traitement
-
-echo "Traitement terminé. Résultats disponibles dans le dossier 'tmp'."
+awk -F';' '{print $7, $8}' data.csv > 1.txt
 
 
-LOGS=$(zenity --password --username)
-
-nomUtilisateur=$(echo "$LOGS" | cut -d'|' -f1)
-motdePasse=$(echo "$LOGS" | cut -d'|' -f2)
 
 
-if [ "$nomUtilisateur" = "admin" ] && [ "$motdePasse" = "miaou" ]; then
-	zenity --info --title="Connexion réussie" --text="Bienvenue, chef."
-	chmod 777 main_script.sh
-else
-	zenity --error --title="Echec de la connexion" --text="Nom d'utilisateur et/ou mot de passe incorrecte."
-	
-fi 
 
-exit 0
+
+
+
 
