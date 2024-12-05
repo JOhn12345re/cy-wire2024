@@ -359,7 +359,7 @@ int estABR(Arbre *a){
 }
 
 int estAVL(Arbre *a){
-	if(estABR&&(-1<=equilibre(a)||equilibre(a)<=1)){
+	if(estABR(a)&&(-1<=equilibre(a)||equilibre(a)<=1)){
 		return 1;
 	}
 	return 0;
