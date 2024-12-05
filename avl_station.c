@@ -6,6 +6,7 @@
 typedef struct station{
 	int id;
 	int capacite;
+ 	int company;
 	int conso;
 }Station;
 
@@ -57,7 +58,7 @@ Station *creerStation(File *fichier){
 //Créer la structure Station
     	Station *s = malloc(lignes * sizeof(Station));
     	for(int i=0; i<lignes i++){
-    		if(scanf(fichier, "%d;%d;%d\n", &s->id, &s->capacite, &s->conso) != 3){
+    		if(scanf(fichier, "%d;%d;%d;%d\n", &s->id, &s->capacite, &s->company ,&s->conso) != 4){
 			printf("Le nombre de données n'est pas correcte !\n");
 			exit(2);
 		}
