@@ -48,7 +48,7 @@ Station *creerStation(File *fichier){
     	
     	Station *s = malloc(lignes * sizeof(Station));
     	for(int i=0; i<lignes i++){
-    		scanf(fichier, "%d;%d;%d\n", &s->type, &s->capacite, &s->conso);
+    		scanf(fichier, "%d;%d;%d\n", &s->id, &s->capacite, &s->conso);
     	}
 	fclose(fichier);
 	
@@ -337,7 +337,7 @@ void ecrireStation(Arbre *a){
 	
 	if(a != NULL){
 		ecrireStation(a->fg);
-		fprintf(fichier, "%d:%d:%d\n",s->type, s->capacite, somme(a));
+		fprintf(fichier, "%d:%d:%d\n",s->id, s->capacite, somme(a));
 		ecrireStation(a->fd);
 	}
 	fclose(fichier);
