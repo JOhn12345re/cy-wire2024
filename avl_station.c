@@ -38,22 +38,7 @@ Station *creerStation(File *fichier){
 	
 	return s;
 }
-// ecris dans un fichier les données de chaque station stocké dans un arbre
-void ecrireStation(Arbre *a){
-	
-	FILE *fichier = fopen(FICHIER_SORTIE,"w");
-	
-	if(fichier == NULL){
-		exit(2);
-	}
-	
-	if(a != NULL){
-		ecrireStation(a->fg);
-		fprintf(fichier, "%d:%d:%d\n",s->type, s->capacite, s->conso);
-		ecrireStation(a->fd);
-	}
-	fclose(fichier);
-}
+
 
 Arbre *creerAVL(Station s){
 	Arbre *n=malloc(sizeof(Arbre));
@@ -325,6 +310,23 @@ int somme(Arbre *a){
 	return a->s->conso+somme(a->fg)+somme(a->fd);
 }
 
+// ecris dans un fichier les données de chaque station stocké dans un arbre
+void ecrireStation(Arbre *a){
+	
+	FILE *fichier = fopen(FICHIER_SORTIE,"w");
+	
+	if(fichier == NULL){
+		exit(2);
+	}
+	
+	if(a != NULL){
+		ecrireStation(a->fg);
+		fprintf(fichier, "%d:%d:%d\n",s->type, s->capacite, somme(a));
+		ecrireStation(a->fd);
+	}
+	fclose(fichier);
+}
+
 int main(int argc, char ** argv){
 FILE* f=NULL;
 Station *station=NULL;
@@ -346,7 +348,12 @@ while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
 	AVL = insertionAVL(AVL,station,h);
 }
 
-int somme=somme(AVL);
+if(estAVL(AVL)==0){
+	printf("structure AVL incorect");
+	return 1;
+}
+
+ecrireStation(AVL);
 
 return 0;
 }
