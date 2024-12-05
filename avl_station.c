@@ -48,7 +48,10 @@ Station *creerStation(File *fichier){
     	
     	Station *s = malloc(lignes * sizeof(Station));
     	for(int i=0; i<lignes i++){
-    		scanf(fichier, "%d;%d;%d\n", &s->id, &s->capacite, &s->conso);
+    		if(scanf(fichier, "%d;%d;%d\n", &s->id, &s->capacite, &s->conso) != 3){
+			printf("Le nombre de données n'est pas correcte !\n");
+			exit(2);
+		}
     	}
 	fclose(fichier);
 	
@@ -59,7 +62,7 @@ Station *creerStation(File *fichier){
 Arbre *creerAVL(Station s){
 	Arbre *n=malloc(sizeof(Arbre));
 	if(n==NULL){
-		exit(1);
+		exit(3);
 	}
 	n->elmt=s;
 	n->fg=NULL;
@@ -332,7 +335,7 @@ void ecrireStation(Arbre *a){
 	FILE *fichier = fopen(FICHIER_SORTIE,"w");
 	
 	if(fichier == NULL){
-		exit(2);
+		exit(4);
 	}
 	fprintf(fichier, "id:capacite:conso_ttl:production\n");
 	if(a != NULL){
