@@ -230,17 +230,17 @@ Arbre *equilibreAVL(Arbre *a){
 	return a;
 }
 
-Arbre *insertionAVL(Arbre *a, int e, int *h){
+Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 	if(estVide(a)==1){
 		*h=1;
-		return creerAVL(e);
+		return creerAVL(stat);
 	}
-	else if(e<a->elmt){
-		a->fg=insertionAVL(a->fg, e, h);
+	else if(stat->capacite < a->s->capacite){
+		a->fg=insertionAVL(a->fg, stat, h);
 		*h=-*h;
 	}
-	else if(e>a->elmt){
-		a->fd=insertionAVL(a->fd, e, h);
+	else if(stat->capacite > a->s->capacite){
+		a->fd=insertionAVL(a->fd, stat, h);
 	}
 	else{
 		*h=0;
@@ -323,4 +323,30 @@ int somme(Arbre *a){
 		return 0;
 	}
 	return a->s->conso+somme(a->fg)+somme(a->fd);
+}
+
+int main(int argc, char ** argv){
+FILE* f=NULL;
+Station *station=NULL;
+int *h;
+
+f=fopen("","r+");
+
+if (f == NULL) {
+	printf("Impossible d'ouvrir le fichier.\n");
+	return 1;
+}
+
+char ligne[1000];
+Arbre *AVL = NULL; // Initialisation de la racine de l'AVL à NULL
+
+while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+	station=creerStation(f);
+        // Insérer les données dans l'AVL
+	AVL = insertionAVL(AVL,station,h);
+}
+
+int somme=somme(AVL);
+
+return 0;
 }
