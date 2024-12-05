@@ -369,7 +369,7 @@ while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
 
 if(estAVL(AVL)==0){
 	printf("structure AVL incorect");
-	return 1;
+	return 2;
 }
 
 ecrireStation(AVL);
