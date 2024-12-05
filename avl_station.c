@@ -334,10 +334,10 @@ void ecrireStation(Arbre *a){
 	if(fichier == NULL){
 		exit(2);
 	}
-	
+	fprintf(fichier, "id:capacite:conso_ttl:production\n");
 	if(a != NULL){
 		ecrireStation(a->fg);
-		fprintf(fichier, "%d:%d:%d\n",s->id, s->capacite, somme(a));
+		fprintf(fichier, "%d:%d:%d:%d\n",s->id, s->capacite, somme(a), (somme(a)/s->capacite));
 		ecrireStation(a->fd);
 	}
 	fclose(fichier);
