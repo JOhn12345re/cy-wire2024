@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//Structures
 typedef struct station{
 	int id;
 	int capacite;
@@ -14,7 +15,7 @@ typedef struct arbre{
 	struct arbre* fd;
 }Arbre;
 
-
+//Fonctions
 int testSiFichierVide(FILE *fichier);
 Station *creerStation(File *fichier);
 Arbre *creerAVL(Station s);
