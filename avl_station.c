@@ -269,3 +269,10 @@ int estAVL(Arbre *a){
 	}
 	return 0;
 }
+
+int somme(Arbre *a){
+	if (a==NULL){
+		return 0;
+	}
+	return a->s->consomation+somme(a->fg)+somme(a->fd);
+}
