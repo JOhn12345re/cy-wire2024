@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define couleur(param) printf("\033[%sm",param)
 
 //Structures
 typedef struct station{
