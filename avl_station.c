@@ -19,7 +19,7 @@ typedef struct arbre{
 }Arbre;
 */
 
-#include "avl_station"
+#include "avl_station.h"
 
 //Vérifie si le fichier ouvert est vide ou non
 int testSiFichierVide(FILE *fichier){ 
@@ -35,7 +35,7 @@ int testSiFichierVide(FILE *fichier){
 }
 
 //Recupérer les données du fichier texte et les mettre dans la structure station;
-Station *creerStation(File *fichier){
+Station *creerStation(FILE *fichier){
 
 	lignes = 0;
 	
