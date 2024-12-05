@@ -244,6 +244,14 @@ Arbre *insertionAVL(Arbre *a, int e, int *h){
 	return a;
 }
 
+void infixe(Arbre *a){
+	if(a!=NULL){
+		infixe(a->fg);
+		printf("%d \n",a->elmt);
+		infixe(a->fd);
+	}
+}
+
 int verifFilsDroit(Arbre *a, int min){
 	if(estVide(a)==1){
 		return 1;
