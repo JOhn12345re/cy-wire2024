@@ -4,7 +4,7 @@
 typedef struct station{
 	int id;
 	int capacite;
-	int cosomation;
+	int conso;
 }Station;
 
 typedef struct arbre{
@@ -299,5 +299,5 @@ int somme(Arbre *a){
 	if (a==NULL){
 		return 0;
 	}
-	return a->s->consomation+somme(a->fg)+somme(a->fd);
+	return a->s->conso+somme(a->fg)+somme(a->fd);
 }
