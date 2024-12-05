@@ -1,3 +1,4 @@
+/*
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,6 +16,9 @@ typedef struct arbre{
 	struct arbre* fg;
 	struct arbre* fd;
 }Arbre;
+*/
+
+#include "avl_station"
 
 //Vérifie si le fichier ouvert est vide ou non
 int testSiFichierVide(FILE *fichier){ 
