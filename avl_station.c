@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//Structure de la station
 typedef struct station{
 	int id;
 	int capacite;
 	int conso;
 }Station;
 
+//Structure de l'arbre
 typedef struct arbre{
 	Station s;
 	int eq;
@@ -14,7 +16,8 @@ typedef struct arbre{
 	struct arbre* fd;
 }Arbre;
 
-int testSiFichierVide(FILE *fichier){ // vérifie si le fichier ouvert est vide ou non
+//Vérifie si le fichier ouvert est vide ou non
+int testSiFichierVide(FILE *fichier){ 
     int caracterePremier = 0;
  
     caracterePremier = fgetc(fichier); 
@@ -26,7 +29,7 @@ int testSiFichierVide(FILE *fichier){ // vérifie si le fichier ouvert est vide 
     return 0; 
 }
 
-// recupérer les données du fichier texte et les mettre dans la structure station;
+//Recupérer les données du fichier texte et les mettre dans la structure station;
 Station *creerStation(File *fichier){
 
 	lignes = 0;
@@ -38,7 +41,8 @@ Station *creerStation(File *fichier){
 		fclose(fichier);
 		return NULL;
 	}
-	
+
+//Compte le nombre de ligne du fichier
 	while((c = fgetc(fichier)) != EOF){
         	if(c == '\n'){
             	lignes++;
@@ -46,6 +50,7 @@ Station *creerStation(File *fichier){
     	}
     	rewind(fichier);
     	
+//Créer la structure Station
     	Station *s = malloc(lignes * sizeof(Station));
     	for(int i=0; i<lignes i++){
     		if(scanf(fichier, "%d;%d;%d\n", &s->id, &s->capacite, &s->conso) != 3){
@@ -58,7 +63,7 @@ Station *creerStation(File *fichier){
 	return s;
 }
 
-
+//Créer l'arbre AVL
 Arbre *creerAVL(Station s){
 	Arbre *n=malloc(sizeof(Arbre));
 	if(n==NULL){
@@ -71,6 +76,7 @@ Arbre *creerAVL(Station s){
 	return n;
 }
 
+//Vérifie si AVL est vide
 int estVide(Arbre *a){
 	if(a==NULL){
 		return 1;
@@ -78,6 +84,7 @@ int estVide(Arbre *a){
 	return 0;
 }
 
+//Vérifie si le noeud est une feuille
 int estFeuille(Arbre *a){
 	if(estVide(a)==1){
 		printf("vide");
@@ -89,6 +96,7 @@ int estFeuille(Arbre *a){
 	return 1;
 }
 
+//Vérifie si le fils gauche existe
 int existeFilsGauche(Arbre *a){
 	if(estVide(a)==1||a->fg==NULL){
 		return 0;
@@ -96,6 +104,7 @@ int existeFilsGauche(Arbre *a){
 	return 1;
 }
 
+//Vérifie si le fils droit existe
 int existeFilsDroite(Arbre *a){
 	if(estVide(a)==1||a->fd==NULL){
 		return 0;
@@ -103,6 +112,7 @@ int existeFilsDroite(Arbre *a){
 	return 1;
 }
 
+//Calcul la hauteur de AVL
 int hauteur(Arbre *a){
 	if(estVide(a)==1){
 		return -1;
@@ -120,10 +130,12 @@ int hauteur(Arbre *a){
 	}
 }
 
+//Calcul l'équilibre de AVL
 int equilibre(Arbre *a){
 	return hauteur(a->fd)-hauteur(a->fg);
 }
 
+//Maximum entre une valeur a et b
 int maxg(int a, int b){
 	if(a>b){
 		return a;
@@ -133,6 +145,7 @@ int maxg(int a, int b){
 	}
 }
 
+//Minimum entre une valeur a,b et c
 int ming(int a, int b, int c){
 	if(a<b){
 		if(a<c){
@@ -152,6 +165,7 @@ int ming(int a, int b, int c){
 	}
 }
 
+//Minimum entre une valeur a et b
 int mind(int a, int b){
 	if(a<b){
 		return a;
@@ -161,6 +175,7 @@ int mind(int a, int b){
 	}
 }
 
+//Maximum entre une valeur a,b et c
 int maxd(int a, int b, int c){
 	if(a>b){
 		if(a>c){
@@ -180,18 +195,20 @@ int maxd(int a, int b, int c){
 	}
 }
 
+//Rotation gauche
 Arbre *RotationGauche(Arbre *a){
 	Arbre *pivot=a->fd;
 	a->fd=pivot->fg;
 	pivot->fg=a;
 	int eq_a=a->eq;
 	int eq_b=pivot->eq;
-	a->eq=eq_a-maxg(eq_b,0);
-	a->eq=ming(eq_a-2,eq_a+eq_b-2, eq_b-1);
+	a->eq=eq_a-maxg(eq_b,0)-1;
+	pivot->eq=ming(eq_a-2,eq_a+eq_b-2, eq_b-1);
 	a=pivot;
 	return a;
 }
 
+//Rotation droite
 Arbre *RotationDroite(Arbre *a){
 	Arbre *pivot=a->fg;
 	a->fg=pivot->fd;
@@ -199,21 +216,24 @@ Arbre *RotationDroite(Arbre *a){
 	int eq_a=a->eq;
 	int eq_b=pivot->eq;
 	a->eq=eq_a-mind(eq_b,0)+1;
-	a->eq=maxd(eq_a+2,eq_a+eq_b+2, eq_b+1);
+	pivot->eq=maxd(eq_a+2,eq_a+eq_b+2, eq_b+1);
 	a=pivot;
 	return a;
 }
 
+//Double rotation gauche
 Arbre *DblRotationGauche(Arbre *a){
 	a->fd=RotationDroite(a->fd);
 	return RotationGauche(a);
 }
 
+//Double rotation droite
 Arbre *DblRotationDroite(Arbre *a){
 	a->fg=RotationGauche(a->fg);
 	return RotationDroite(a);
 }
 
+//Réequilibrer AVL
 Arbre *equilibreAVL(Arbre *a){
 	if(equilibre(a)>=2){
 		if(equilibre(a->fd)>=0){
@@ -234,6 +254,7 @@ Arbre *equilibreAVL(Arbre *a){
 	return a;
 }
 
+//Inserer un nouveaux noeud dans AVL
 Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 	if(estVide(a)==1){
 		*h=1;
@@ -263,6 +284,7 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 	return a;
 }
 
+//Parcours Infixe de AVL
 void infixe(Arbre *a){
 	if(a!=NULL){
 		infixe(a->fg);
@@ -271,6 +293,7 @@ void infixe(Arbre *a){
 	}
 }
 
+//Vérifier si le fils droit est en norme
 int verifFilsDroit(Arbre *a, int min){
 	if(estVide(a)==1){
 		return 1;
@@ -287,6 +310,7 @@ int verifFilsDroit(Arbre *a, int min){
 	return 1;
 }
 
+//Vérifier si le fils gauche est en norme
 int verifFilsGauche(Arbre *a, int max){
 	if(estVide(a)==1){
 		return 1;
@@ -302,6 +326,7 @@ int verifFilsGauche(Arbre *a, int max){
 	return 1;
 }
 
+//Vérifier si l'arbre est un ABR
 int estABR(Arbre *a){
 	if(estVide(a)==1||estFeuille(a)==1){
 		return 1;
@@ -315,6 +340,7 @@ int estABR(Arbre *a){
 	return estABR(a->fg) && estABR(a->fd);
 }
 
+//Vérifier si l'arbre est un AVL
 int estAVL(Arbre *a){
 	if(estABR&&(-1<=equilibre(a)||equilibre(a)<=1)){
 		return 1;
@@ -322,6 +348,7 @@ int estAVL(Arbre *a){
 	return 0;
 }
 
+//Somme de l'ensemble des noeuds de l'arbre
 int somme(Arbre *a){
 	if (a==NULL){
 		return 0;
@@ -329,7 +356,7 @@ int somme(Arbre *a){
 	return a->s->conso+somme(a->fg)+somme(a->fd);
 }
 
-// ecris dans un fichier les données de chaque station stocké dans un arbre
+//Ecris dans un fichier les données de chaque station stocké dans un arbre
 void ecrireStation(Arbre *a){
 	
 	FILE *fichier = fopen(FICHIER_SORTIE,"w");
@@ -337,6 +364,8 @@ void ecrireStation(Arbre *a){
 	if(fichier == NULL){
 		exit(4);
 	}
+	//Premiére ligne
+	//Données: identifiants, capacité, consomation totale et production
 	fprintf(fichier, "id:capacite:conso_ttl:production\n");
 	if(a != NULL){
 		ecrireStation(a->fg);
