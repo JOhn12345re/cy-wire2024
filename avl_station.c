@@ -14,6 +14,18 @@ typedef struct arbre{
 	struct arbre* fd;
 }Arbre;
 
+int testSiFichierVide(FILE *fichier){ // vérifie si le fichier ouvert est vide ou non
+    int caracterePremier = 0;
+ 
+    caracterePremier = fgetc(fichier); 
+    if(caracterePremier == EOF){
+        return 1; 
+    }
+    rewind(fichier);
+    
+    return 0; 
+}
+
 // recupérer les données du fichier texte et les mettre dans la structure station;
 Station *creerStation(File *fichier){
 
@@ -21,6 +33,10 @@ Station *creerStation(File *fichier){
 	
 	if(fichier == NULL){
 		exit(1);
+	}
+	if(testSiFichierVide(fichier){
+		fclose(fichier);
+		return NULL;
 	}
 	
 	while((c = fgetc(fichier)) != EOF){
