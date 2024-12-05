@@ -15,9 +15,8 @@ typedef struct arbre{
 }Arbre;
 
 //recupérer les données du fichier texte et les mettre dans la structure station;
-Station *creerStation(int *lignes){
+Station *creerStation(File *fichier){
 
-	FILE *fichier = fopen(FICHIER_TEXT,"r");
 	*lignes = 0;
 	
 	if(fichier == NULL){
