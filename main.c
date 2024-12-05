@@ -1,8 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
+
 
 //Appele du fichier.h "avl_station.h" du programme "avl_station.c"
-#include <avl_station.h>
+#include "avl_station.h"
 
 
 int main(int argc, char ** argv){
@@ -23,7 +22,7 @@ char ligne[1000];
 Arbre *AVL = NULL; 
 
 //Création de AVL
-while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+while (fgets(ligne, sizeof(ligne), f) != NULL) {
 	station=creerStation(f);
         // Insérer les données dans l'AVL
 	AVL = insertionAVL(AVL,station,h);
