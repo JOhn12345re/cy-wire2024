@@ -14,10 +14,10 @@ typedef struct arbre{
 	struct arbre* fd;
 }Arbre;
 
-//recupérer les données du fichier texte et les mettre dans la structure station;
+// recupérer les données du fichier texte et les mettre dans la structure station;
 Station *creerStation(File *fichier){
 
-	*lignes = 0;
+	lignes = 0;
 	
 	if(fichier == NULL){
 		exit(1);
@@ -25,18 +25,34 @@ Station *creerStation(File *fichier){
 	
 	while((c = fgetc(fichier)) != EOF){
         	if(c == '\n'){
-            	(*lignes)++;
+            	lignes++;
         	}
     	}
     	rewind(fichier);
     	
-    	Station *s = malloc((*lignes) * sizeof(Station));
-    	for(int i=0; i<(*lignes); i++){
+    	Station *s = malloc(lignes * sizeof(Station));
+    	for(int i=0; i<lignes i++){
     		scanf(fichier, "%d;%d;%d\n", &s->type, &s->capacite, &s->conso);
     	}
 	fclose(fichier);
 	
 	return s;
+}
+// ecris dans un fichier les données de chaque station stocké dans un arbre
+void ecrireStation(Arbre *a){
+	
+	FILE *fichier = fopen(FICHIER_SORTIE,"w");
+	
+	if(fichier == NULL){
+		exit(2);
+	}
+	
+	if(a != NULL){
+		ecrireStation(a->fg);
+		fprintf(fichier, "%d:%d:%d\n",s->type, s->capacite, s->conso);
+		ecrireStation(a->fd);
+	}
+	fclose(fichier);
 }
 
 Arbre *creerAVL(Station s){
