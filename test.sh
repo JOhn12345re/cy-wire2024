@@ -70,7 +70,17 @@ fi
 # Traitement du fichier CSV
 echo "Traitement en cours sur le fichier CSV..."
 
-awk -F';' '{print $7, $8}' data.csv > 1.txt
+if [[ "$TYPE_STATION" == "hva" ]]; then
+    # Extraction des colonnes spécifiques avec cut
+    cut -d";" -f3,5,7,8 "$CHEMIN_CSV" > test.csv
+    
+    # Filtrage des lignes où la première colonne n'est pas "-"
+    awk -F";" '{if ($1 != "-") print $0}' test.csv > test1.csv
+
+    # Fin du script si la condition est remplie
+    exit 1
+fi
+
 
 
 
