@@ -10,7 +10,7 @@ FILE* f=NULL;
 Station *station=NULL;
 int *h;
 //argv[1] f.txt
-f=fopen("","r+");
+f=fopen("test.csv","r+");
 
 if (f == NULL) {
 	printf("Impossible d'ouvrir le fichier.\n");
