@@ -8,7 +8,7 @@ int main(int argc, char ** argv){
 FILE* f=NULL;
 Station *station=NULL;
 int *h;
-
+//argv[1]
 f=fopen("","r+");
 
 if (f == NULL) {
