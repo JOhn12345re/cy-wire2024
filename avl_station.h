@@ -6,6 +6,7 @@
 typedef struct station{
 	int id;
 	int capacite;
+	int company; 
 	int conso;
 }Station;
 
