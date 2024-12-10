@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define couleur(param) printf("\033[%sm",param)
+#define FICHIER_SORTIE "sortie.txt"
 
 //Structures
 typedef struct station{
@@ -35,7 +36,7 @@ Arbre *RotationDroite(Arbre *a);
 Arbre *DblRotationGauche(Arbre *a);
 Arbre *DblRotationDroite(Arbre *a);
 Arbre *equilibreAVL(Arbre *a);
-Arbre *insertionAVL(Arbre *a, Station *stat, int *h);
+Arbre *insertionAVL(Arbre *a, Station stat, int *h);
 void infixe(Arbre *a);
 int verifFilsDroit(Arbre *a, int min);
 int verifFilsGauche(Arbre *a, int max);
