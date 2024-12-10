@@ -37,17 +37,18 @@ int testSiFichierVide(FILE *fichier){
 //Recupérer les données du fichier texte et les mettre dans la structure station;
 Station *creerStation(FILE *fichier){
 
-	lignes = 0;
+	int lignes = 0;
 	
 	if(fichier == NULL){
 		exit(1);
 	}
-	if(testSiFichierVide(fichier){
+	if(testSiFichierVide(fichier)){
 		fclose(fichier);
 		return NULL;
 	}
 
 //Compte le nombre de ligne du fichier
+	char c;
 	while((c = fgetc(fichier)) != EOF){
         	if(c == '\n'){
             	lignes++;
@@ -57,8 +58,8 @@ Station *creerStation(FILE *fichier){
     	
 //Créer la structure Station
     	Station *s = malloc(lignes * sizeof(Station));
-    	for(int i=0; i<lignes i++){
-    		if(scanf(fichier, "%d;%d;%d;%d\n", &s->id, &s->capacite, &s->company ,&s->conso) != 4){
+    	for(int i=0; i<lignes; i++){
+    		if(fscanf(fichier, "%d;%d;%d;%d\n", &s->id, &s->capacite, &s->company ,&s->conso) != 4){
 			printf("Le nombre de données n'est pas correcte !\n");
 			exit(2);
 		}
@@ -74,7 +75,7 @@ Arbre *creerAVL(Station s){
 	if(n==NULL){
 		exit(3);
 	}
-	n->elmt=s;
+	n->s=s;
 	n->fg=NULL;
 	n->fd=NULL;
 	n->eq=0;
@@ -265,11 +266,11 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 		*h=1;
 		return creerAVL(stat);
 	}
-	else if(stat->capacite < a->s->capacite){
+	else if(stat.capacite < a->s.capacite){
 		a->fg=insertionAVL(a->fg, stat, h);
 		*h=-*h;
 	}
-	else if(stat->capacite > a->s->capacite){
+	else if(stat.capacite > a->s.capacite){
 		a->fd=insertionAVL(a->fd, stat, h);
 	}
 	else{
@@ -293,7 +294,7 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 void infixe(Arbre *a){
 	if(a!=NULL){
 		infixe(a->fg);
-		printf("%d \n",a->elmt);
+		printf("%d \n",a->s);
 		infixe(a->fd);
 	}
 }
@@ -305,7 +306,7 @@ int verifFilsDroit(Arbre *a, int min){
 	}
 	if(a!=NULL){
 		
-		if(a->s->capacite<min){
+		if(a->s.capacite<min){
 			return 0;
 		}
 		
@@ -322,7 +323,7 @@ int verifFilsGauche(Arbre *a, int max){
 	}
 	if(a!=NULL){
 		
-		if(a->s->capacite>max){
+		if(a->s.capacite>max){
 			return 0;
 		}
 		verifFilsGauche(a->fg,max);
@@ -336,8 +337,8 @@ int estABR(Arbre *a){
 	if(estVide(a)==1||estFeuille(a)==1){
 		return 1;
 	}
-	int veriffd=verifFilsDroit(a->fd,a->s->capacite);
-	int veriffg=verifFilsGauche(a->fg,a->s->capacite);
+	int veriffd=verifFilsDroit(a->fd,a->s.capacite);
+	int veriffg=verifFilsGauche(a->fg,a->s.capacite);
 	if(veriffd==0||veriffg==0){
 		return 0;
 	}
@@ -358,7 +359,7 @@ int somme(Arbre *a){
 	if (a==NULL){
 		return 0;
 	}
-	return a->s->conso+somme(a->fg)+somme(a->fd);
+	return a->s.conso+somme(a->fg)+somme(a->fd);
 }
 
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
@@ -374,9 +375,9 @@ void ecrireStation(Arbre *a){
 	fprintf(fichier, "id:capacite:conso_ttl:production\n");
 	if(a != NULL){
 		ecrireStation(a->fg);
-		fprintf(fichier, "%d:%d:%d:%d\n",s->id, s->capacite, somme(a), (somme(a)/s->capacite));
+		fprintf(fichier, "%d:%d:%d:%d\n",a->s.id, a->s.capacite, somme(a), (somme(a)/a->s.capacite));
 		ecrireStation(a->fd);
 	}
 	fclose(fichier);
 }
-}
+
