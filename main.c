@@ -25,7 +25,7 @@ Arbre *AVL = NULL;
 while (fgets(ligne, sizeof(ligne), f) != NULL) {
 	station=creerStation(f);
         // Insérer les données dans l'AVL
-	AVL = insertionAVL(AVL,station,h);
+	AVL = insertionAVL(AVL,*station,h);
 }
 
 //Vérifier si l'arbre est bien un AVL
