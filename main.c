@@ -7,9 +7,9 @@
 int main(int argc, char ** argv){
 FILE* f=NULL;
 Station *station=NULL;
-int *h;
+int h;
 //argv[1] f.txt
-f=fopen("test.csv","r+");
+f=fopen(argv[1],"r+");
 
 if (f == NULL) {
 	printf("Impossible d'ouvrir le fichier.\n");
@@ -25,7 +25,7 @@ Arbre *AVL = NULL;
 while (fgets(ligne, sizeof(ligne), f) != NULL) {
 	station=creerStation(f);
         // Insérer les données dans l'AVL
-	AVL = insertionAVL(AVL,*station,h);
+	AVL = insertionAVL(AVL,*station,&h);
 }
 
 //Vérifier si l'arbre est bien un AVL
