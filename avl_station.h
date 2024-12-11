@@ -6,8 +6,7 @@
 //Structures
 typedef struct station{
 	int id;
-	int capacite;
-	int company; 
+	int capacite; 
 	int conso;
 }Station;
 
