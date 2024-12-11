@@ -6,7 +6,6 @@
 typedef struct station{
 	int id;
 	int capacite;
- 	int company;
 	int conso;
 }Station;
 
@@ -59,7 +58,7 @@ Station *creerStation(FILE *fichier){
 //Créer la structure Station
     	Station *s = malloc(lignes * sizeof(Station));
     	for(int i=0; i<lignes; i++){
-    		if(fscanf(fichier, "%d;%d;%d;%d\n", &s->id, &s->capacite, &s->company ,&s->conso) != 4){
+    		if(fscanf(fichier, "%d %d %d\n", &s->id, &s->capacite ,&s->conso) != 3){
 			printf("Le nombre de données n'est pas correcte !\n");
 			exit(2);
 		}
@@ -359,7 +358,9 @@ int somme(Arbre *a){
 	if (a==NULL){
 		return 0;
 	}
-	return a->s.conso+somme(a->fg)+somme(a->fd);
+	if(){
+		return a->s.conso+somme(a->fg)+somme(a->fd);
+	}
 }
 
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
@@ -380,4 +381,3 @@ void ecrireStation(Arbre *a){
 	}
 	fclose(fichier);
 }
-
