@@ -265,12 +265,16 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 		*h=1;
 		return creerAVL(stat);
 	}
-	else if(stat.capacite < a->s.capacite){
+	else if(stat.id < a->s.id){
 		a->fg=insertionAVL(a->fg, stat, h);
 		*h=-*h;
 	}
-	else if(stat.capacite > a->s.capacite){
+	else if(stat.id > a->s.id){
 		a->fd=insertionAVL(a->fd, stat, h);
+	}
+	else if(stat.id == a->s.id){
+		a->s.conso+=stat.conso;
+		return a;
 	}
 	else{
 		*h=0;
