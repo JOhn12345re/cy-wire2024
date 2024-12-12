@@ -34,7 +34,6 @@ Arbre *DblRotationGauche(Arbre *a);
 Arbre *DblRotationDroite(Arbre *a);
 Arbre *equilibreAVL(Arbre *a);
 Arbre *insertionAVL(Arbre *a, Station stat, int *h);
-void infixe(Arbre *a);
 int verifFilsDroit(Arbre *a, int min);
 int verifFilsGauche(Arbre *a, int max);
 int estABR(Arbre *a);
