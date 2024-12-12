@@ -86,62 +86,22 @@ int equilibre(Arbre *a){
 }
 
 //Maximum entre une valeur a et b
-int maxg(int a, int b){
+int max(int a, int b){
 	if(a>b){
 		return a;
 	}
 	else{
 		return b;
-	}
-}
-
-//Minimum entre une valeur a,b et c
-int ming(int a, int b, int c){
-	if(a<b){
-		if(a<c){
-			return a;
-		}
-		else{
-			return c;
-		}
-	}
-	else{
-		if(b<c){
-			return b;
-		}
-		else{
-			return c;
-		}
 	}
 }
 
 //Minimum entre une valeur a et b
-int mind(int a, int b){
+int min(int a, int b){
 	if(a<b){
 		return a;
 	}
 	else{
 		return b;
-	}
-}
-
-//Maximum entre une valeur a,b et c
-int maxd(int a, int b, int c){
-	if(a>b){
-		if(a>c){
-			return a;
-		}
-		else{
-			return c;
-		}
-	}
-	else{
-		if(b>c){
-			return b;
-		}
-		else{
-			return c;
-		}
 	}
 }
 
@@ -152,8 +112,8 @@ Arbre *RotationGauche(Arbre *a){
 	pivot->fg=a;
 	int eq_a=a->eq;
 	int eq_b=pivot->eq;
-	a->eq=eq_a-maxg(eq_b,0)-1;
-	pivot->eq=ming(eq_a-2,eq_a+eq_b-2, eq_b-1);
+	a->eq=eq_a-max(eq_b,0)-1;
+	pivot->eq=min(eq_a-2,min(eq_a+eq_b-2, eq_b-1));
 	a=pivot;
 	return a;
 }
@@ -165,8 +125,8 @@ Arbre *RotationDroite(Arbre *a){
 	pivot->fd=a;
 	int eq_a=a->eq;
 	int eq_b=pivot->eq;
-	a->eq=eq_a-mind(eq_b,0)+1;
-	pivot->eq=maxd(eq_a+2,eq_a+eq_b+2, eq_b+1);
+	a->eq=eq_a-min(eq_b,0)+1;
+	pivot->eq=max(eq_a+2,max(eq_a+eq_b+2, eq_b+1));
 	a=pivot;
 	return a;
 }
