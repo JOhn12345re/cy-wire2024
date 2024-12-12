@@ -240,7 +240,7 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 	}
 	else if(stat.id == a->s.id){
 		a->s.conso+=stat.conso;
-		return a;
+		
 	}
 	else{
 		*h=0;
@@ -263,7 +263,7 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 void infixe(Arbre *a){
 	if(a!=NULL){
 		infixe(a->fg);
-		printf("%d \n",a->s.capacite);
+		printf("%d %ld %ld->%d\n",a->s.id, a->s.capacite, a->s.conso, equilibre(a));
 		infixe(a->fd);
 	}
 }
@@ -334,13 +334,12 @@ int estAVL(Arbre *a){
 	return 0;
 }
 
-
 //Somme de l'ensemble des noeuds de l'arbre
 double somme(Arbre *a){
 	if (a==NULL){
 		return 0;
 	}
-	return a->s.conso+somme(a->fg)+somme(a->fd);.
+	return a->s.conso+somme(a->fg)+somme(a->fd);
 }
 
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
@@ -356,8 +355,7 @@ void ecrireStation(Arbre *a){
 	fprintf(fichier, "id:capacite:conso_ttl:production\n");
 	if(a != NULL){
 		ecrireStation(a->fg);
-		fprintf(fichier, "%d:%ld:%ld:%ld\n",a->s.id, a->s.capacite, somme(a), 
-		(somme(a)/a->s.capacite));
+		fprintf(fichier, "%d:%ld:%ld\n",a->s.id, a->s.capacite, a->s.conso);
 		ecrireStation(a->fd);
 	}
 	fclose(fichier);
