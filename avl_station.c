@@ -275,7 +275,7 @@ int verifFilsDroit(Arbre *a, int min){
 	}
 	if(a!=NULL){
 		
-		if(a->s.capacite<min){
+		if(a->s.id<min){
 			return 0;
 		}
 		
@@ -292,7 +292,7 @@ int verifFilsGauche(Arbre *a, int max){
 	}
 	if(a!=NULL){
 		
-		if(a->s.capacite>max){
+		if(a->s.id>max){
 			return 0;
 		}
 		verifFilsGauche(a->fg,max);
@@ -306,8 +306,8 @@ int estABR(Arbre *a){
 	if(estVide(a)==1||estFeuille(a)==1){
 		return 1;
 	}
-	int veriffd=verifFilsDroit(a->fd,a->s.capacite);
-	int veriffg=verifFilsGauche(a->fg,a->s.capacite);
+	int veriffd=verifFilsDroit(a->fd,a->s.id);
+	int veriffg=verifFilsGauche(a->fg,a->s.id);
 	if(veriffd==0||veriffg==0){
 		return 0;
 	}
@@ -315,13 +315,25 @@ int estABR(Arbre *a){
 	return estABR(a->fg) && estABR(a->fd);
 }
 
+//chatgpt
+int estEquilibre(Arbre *a){
+	if(a==NULL){
+		return 1;
+	}
+	if(-1>equilibre(a)||equilibre(a)>1){
+		return 0;
+	}
+	return estEquilibre(a->fg)&&estEquilibre(a->fd);
+}
+
 //Vérifier si l'arbre est un AVL
 int estAVL(Arbre *a){
-	if(estABR(a)&&(-1<=equilibre(a)||equilibre(a)<=1)){
+	if(estABR(a)&&estEquilibre(a)){
 		return 1;
 	}
 	return 0;
 }
+
 
 //Somme de l'ensemble des noeuds de l'arbre
 double somme(Arbre *a){
