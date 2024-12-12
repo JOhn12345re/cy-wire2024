@@ -18,7 +18,6 @@ typedef struct arbre{
 
 //Fonctions
 int testSiFichierVide(FILE *fichier);
-Station creerStation(FILE *fichier);
 Arbre *creerAVL(Station s);
 int estVide(Arbre *a);
 int estFeuille(Arbre *a);
