@@ -343,20 +343,18 @@ double somme(Arbre *a){
 }
 
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
-void ecrireStation(Arbre *a){
+void ecrireStation(Arbre *a, FILE *fichier){
 	
-	FILE *fichier = fopen("TEST.txt","w");
+	
 	
 	if(fichier == NULL){
 		exit(4);
 	}
-	//Premiére ligne
-	//Données: identifiants, capacité, consomation totale et production
-	fprintf(fichier, "id:capacite:conso_ttl:production\n");
+	
 	if(a != NULL){
-		ecrireStation(a->fg);
+		ecrireStation(a->fg,fichier);
 		fprintf(fichier, "%d:%ld:%ld\n",a->s.id, a->s.capacite, a->s.conso);
-		ecrireStation(a->fd);
+		ecrireStation(a->fd,fichier);
 	}
-	fclose(fichier);
+	
 }
