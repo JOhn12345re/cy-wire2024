@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define couleur(param) printf("\033[%sm",param)
-#define FICHIER_SORTIE "sortie.txt"
 
 //Structures
 typedef struct station{
 	int id;
-	int capacite; 
-	int conso;
+	long capacite;
+	long conso;
 }Station;
 
 typedef struct arbre{
@@ -19,7 +18,7 @@ typedef struct arbre{
 
 //Fonctions
 int testSiFichierVide(FILE *fichier);
-Station *creerStation(FILE *fichier);
+Station creerStation(FILE *fichier);
 Arbre *creerAVL(Station s);
 int estVide(Arbre *a);
 int estFeuille(Arbre *a);
@@ -41,5 +40,5 @@ int verifFilsDroit(Arbre *a, int min);
 int verifFilsGauche(Arbre *a, int max);
 int estABR(Arbre *a);
 int estAVL(Arbre *a);
-int somme(Arbre *a);
+double somme(Arbre *a);
 void ecrireStation(Arbre *a);
