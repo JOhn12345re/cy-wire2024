@@ -48,10 +48,9 @@ if [[ "$TYPE_CONSOMMATEUR" != "comp" && "$TYPE_CONSOMMATEUR" != "indiv" && "$TYP
   exit 1
 fi
 
-
 # Vérifier si des combinaisons interdites sont présentes
-if { [[ "$TYPE_STATION" == "hvb" && ( "$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CONSOMMATEUR" == "indiv" ) ]] || \
-     [[ "$TYPE_STATION" == "hva" && ( "$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CONSOMMATEUR" == "indiv" ) ]]; }; then
+if [[ ("$TYPE_STATION" == "hvb" && ("$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CONSOMMATEUR" == "indiv")) || \
+      ("$TYPE_STATION" == "hva" && ("$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CONSOMMATEUR" == "indiv")) ]]; then
   echo "Erreur : La combinaison de station et consommateur n'est pas autorisée."
   echo "Les combinaisons interdites sont :"
   echo "  - hvb all"
@@ -60,6 +59,7 @@ if { [[ "$TYPE_STATION" == "hvb" && ( "$TYPE_CONSOMMATEUR" == "all" || "$TYPE_CO
   echo "  - hva indiv"
   exit 1
 fi
+
 # Vérification de l'existence du fichier CSV
 if [[ ! -f "$CHEMIN_CSV" ]]; then
   echo "Erreur : Fichier CSV introuvable : $CHEMIN_CSV"
@@ -70,23 +70,69 @@ fi
 # Traitement du fichier CSV
 echo "Traitement en cours sur le fichier CSV..."
 
-if [[ "$TYPE_STATION" == "hva" ]]; then
-    # Extraction des colonnes spécifiques avec cut
-    cut -d";" -f3,5,7,8 "$CHEMIN_CSV" > test.csv
-    
-    # Filtrage des lignes où la première colonne n'est pas "-"
-    awk -F";" '{if ($1 != "-") print $0}' test.csv > test1.csv
-
-    # Fin du script si la condition est remplie
-    exit 1
+# Vérification de la variable TYPE_STATION et TYPE_CONSOMMATEUR
+if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
+    # Traitement avec awk pour "hva"
+    awk -F";" '{
+        if ($3 != "-" && $4 == "-" && $6 == "-") {
+            gsub("-", "0", $3);
+            gsub("-", "0", $7);
+            gsub("-", "0", $8);
+            print $3, $7, $8;
+        }
+    }' "$CHEMIN_CSV" > hva.txt
 fi
 
+if [[ "$TYPE_STATION" == "hvb" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
+    # Traitement avec awk pour "hvb"
+    awk -F";" '{
+        if ($2 != "-" && $3 == "-" && $4 == "-" && $6 == "-") {
+            gsub("-", "0", $2);
+            gsub("-", "0", $7);
+            gsub("-", "0", $8);
+            print $2, $7, $8;
+        }
+    }' "$CHEMIN_CSV" > hvb.txt
+fi
 
+if [[ "$TYPE_STATION" == "lv" ]]; then
+    # Traitement avec awk pour "lv"
+    
+    if [[ "$TYPE_CONSOMMATEUR" == "indiv" ]]; then
+        awk -F";" '{
+            # Remplacement des "-" par "0" dans toutes les colonnes
+            gsub("-", "0", $0); 
+            
+            # Vérification des conditions sur les colonnes 4 et 6
+            if ($4 != "0" && $5 == "0") {
+                # Impression des colonnes 4, 7 et 8
+                print $4, $7, $8
+            }
+        }' "$CHEMIN_CSV" > lvindiv.txt
+    fi
 
+    if [[ "$TYPE_CONSOMMATEUR" == "all" ]]; then
+        awk -F";" '{
+            # Remplacement des "-" par "0" dans toutes les colonnes
+            gsub("-", "0", $0); 
+            
+            if ($4 != "0") {
+                # Impression des colonnes 4, 7 et 8
+                print $4, $7, $8
+            }
+        }' "$CHEMIN_CSV" | tail -n +2 > lvall.txt
+    fi
 
-
-
-
-
-
+    if [[ "$TYPE_CONSOMMATEUR" == "comp" ]]; then
+        awk -F";" '{
+            # Remplacement des "-" par "0" dans toutes les colonnes
+            gsub("-", "0", $0); 
+            
+            # Vérification de la condition et impression des colonnes souhaitées
+            if ($4 != "0" && $6 == "0") {
+                print $4, $7, $8
+            }
+        }' "$CHEMIN_CSV" > lvcomp.txt
+    fi
+fi
 
