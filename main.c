@@ -43,15 +43,24 @@ for(int i = 0; i<n; i++){
 }
 fclose(f);
 
+printf("\n");
+infixe(AVL);
+printf("\n");
 
 //Vérifier si l'arbre est bien un AVL
+
 if(estAVL(AVL)==0){
 	printf("structure AVL incorect");
 	return 1;
 }
 
 //Création du fichier.txt de sortie
-ecrireStation(AVL);
+FILE *fichier = fopen("TEST.txt","w");
+//Premiére ligne
+//Données: identifiants, capacité, consomation totale et production
+fprintf(fichier, "id:capacite:conso_ttl:production\n");
+ecrireStation(AVL,fichier);
+fclose(fichier);
 
 return 0;
 }
