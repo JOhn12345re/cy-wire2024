@@ -1,24 +1,3 @@
-/*
-#include <stdio.h>
-#include <stdlib.h>
-
-//Structure de la station
-typedef struct station{
-	int id;
-	int capacite;
- 	int company;
-	int conso;
-}Station;
-
-//Structure de l'arbre
-typedef struct arbre{
-	Station s;
-	int eq;
-	struct arbre* fg;
-	struct arbre* fd;
-}Arbre;
-*/
-
 #include "avl_station.h"
 
 //Vérifie si le fichier ouvert est vide ou non
@@ -259,15 +238,6 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 	return a;
 }
 
-//Parcours Infixe de AVL
-void infixe(Arbre *a){
-	if(a!=NULL){
-		infixe(a->fg);
-		printf("%d %ld %ld->%d\n",a->s.id, a->s.capacite, a->s.conso, equilibre(a));
-		infixe(a->fd);
-	}
-}
-
 //Vérifier si le fils droit est en norme
 int verifFilsDroit(Arbre *a, int min){
 	if(estVide(a)==1){
@@ -345,12 +315,9 @@ double somme(Arbre *a){
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
 void ecrireStation(Arbre *a, FILE *fichier){
 	
-	
-	
 	if(fichier == NULL){
 		exit(4);
 	}
-	
 	if(a != NULL){
 		ecrireStation(a->fg,fichier);
 		fprintf(fichier, "%d:%ld:%ld\n",a->s.id, a->s.capacite, a->s.conso);
