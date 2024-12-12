@@ -6,6 +6,7 @@
 typedef struct station{
 	int id;
 	int capacite;
+ 	int company;
 	int conso;
 }Station;
 
@@ -33,48 +34,13 @@ int testSiFichierVide(FILE *fichier){
     return 0; 
 }
 
-//Recupérer les données du fichier texte et les mettre dans la structure station;
-Station *creerStation(FILE *fichier){
-
-	int lignes = 0;
-	
-	if(fichier == NULL){
-		exit(1);
-	}
-	if(testSiFichierVide(fichier)){
-		fclose(fichier);
-		return NULL;
-	}
-
-//Compte le nombre de ligne du fichier
-	char c;
-	while((c = fgetc(fichier)) != EOF){
-        	if(c == '\n'){
-            	lignes++;
-        	}
-    	}
-    	rewind(fichier);
-    	
-//Créer la structure Station
-    	Station *s = malloc(lignes * sizeof(Station));
-    	for(int i=0; i<lignes; i++){
-    		if(fscanf(fichier, "%d %d %d\n", &s->id, &s->capacite ,&s->conso) != 3){
-			printf("Le nombre de données n'est pas correcte !\n");
-			exit(2);
-		}
-    	}
-	fclose(fichier);
-	
-	return s;
-}
-
 //Créer l'arbre AVL
-Arbre *creerAVL(Station s){
+Arbre *creerAVL(Station station){
 	Arbre *n=malloc(sizeof(Arbre));
 	if(n==NULL){
 		exit(3);
 	}
-	n->s=s;
+	n->s= station;
 	n->fg=NULL;
 	n->fd=NULL;
 	n->eq=0;
@@ -265,16 +231,12 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 		*h=1;
 		return creerAVL(stat);
 	}
-	else if(stat.id < a->s.id){
+	else if(stat.capacite < a->s.capacite){
 		a->fg=insertionAVL(a->fg, stat, h);
 		*h=-*h;
 	}
-	else if(stat.id > a->s.id){
+	else if(stat.capacite > a->s.capacite){
 		a->fd=insertionAVL(a->fd, stat, h);
-	}
-	else if(stat.id == a->s.id){
-		a->s.conso+=stat.conso;
-		return a;
 	}
 	else{
 		*h=0;
@@ -297,7 +259,7 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 void infixe(Arbre *a){
 	if(a!=NULL){
 		infixe(a->fg);
-		printf("%d \n",a->s);
+		printf("%d \n",a->s.capacite);
 		infixe(a->fd);
 	}
 }
@@ -351,26 +313,24 @@ int estABR(Arbre *a){
 
 //Vérifier si l'arbre est un AVL
 int estAVL(Arbre *a){
-	if(estABR&&(-1<=equilibre(a)||equilibre(a)<=1)){
+	if(estABR(a)&&(-1<=equilibre(a)||equilibre(a)<=1)){
 		return 1;
 	}
 	return 0;
 }
 
 //Somme de l'ensemble des noeuds de l'arbre
-int somme(Arbre *a){
+double somme(Arbre *a){
 	if (a==NULL){
 		return 0;
 	}
-	if(){
-		return a->s.conso+somme(a->fg)+somme(a->fd);
-	}
+	return a->s.conso+somme(a->fg)+somme(a->fd);.
 }
 
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
 void ecrireStation(Arbre *a){
 	
-	FILE *fichier = fopen(FICHIER_SORTIE,"w");
+	FILE *fichier = fopen("TEST.txt","w");
 	
 	if(fichier == NULL){
 		exit(4);
@@ -380,7 +340,8 @@ void ecrireStation(Arbre *a){
 	fprintf(fichier, "id:capacite:conso_ttl:production\n");
 	if(a != NULL){
 		ecrireStation(a->fg);
-		fprintf(fichier, "%d:%d:%d:%d\n",a->s.id, a->s.capacite, somme(a), (somme(a)/a->s.capacite));
+		fprintf(fichier, "%d:%ld:%ld:%ld\n",a->s.id, a->s.capacite, somme(a), 
+		(somme(a)/a->s.capacite));
 		ecrireStation(a->fd);
 	}
 	fclose(fichier);
