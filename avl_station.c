@@ -24,7 +24,6 @@ Arbre *creerAVL(Station station){
 	n->fd=NULL;
 	n->eq=0;
 	return n;
-	free(n);
 }
 
 //Vérifie si AVL est vide
