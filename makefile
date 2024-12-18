@@ -1,6 +1,7 @@
+// 'make' pour compiler tous les fichiers
+// 'make clean' pour effacer les fichiers sortants
 
-
-all: exec clean
+all: exec
 
 main.o : main.c *.h
 	gcc -c main.c -o main.o
@@ -13,3 +14,4 @@ exec : main.o avl_station.o
 
 clean :
 	rm -f *.o
+	rm -f resultat.txt
