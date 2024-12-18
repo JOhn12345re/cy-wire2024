@@ -67,5 +67,7 @@ fprintf(fichier, "id:capacite:conso_ttl\n");
 ecrireStation(AVL,fichier);
 fclose(fichier);
 
+free(AVL);
+	
 return 0;
 }
