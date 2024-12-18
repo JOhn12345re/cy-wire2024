@@ -11,6 +11,7 @@ int h;
 int ligne;
 char c;
 
+
 // Ouverture du fichier en parametre
 f=fopen(argv[1],"r+");
 
@@ -20,6 +21,11 @@ if (f == NULL) {
 	return 1;
 }
 
+if(testSiFichierVide(f)){
+	printf("Le fichier sortant est vide !\n");
+	exit(1);
+}
+ 
 // Initialisation de la racine de l'AVL à NULL
 Arbre *AVL = NULL; 
 
@@ -30,7 +36,6 @@ while((c = fgetc(f)) != EOF){
         }
     }
 rewind(f);
-
 
 //Création de AVL
 for(int i = 0; i<ligne; i++){
@@ -45,11 +50,13 @@ for(int i = 0; i<ligne; i++){
 }
 fclose(f);
 
+
 //Vérifier si l'arbre est bien un AVL
 if(estAVL(AVL)==0){
 	printf("\nStructure AVL incorect\n");
 	return 1;
 }
+
 
 //Création du fichier.txt de sortie
 FILE *fichier = fopen("resultat.txt","w");
@@ -59,6 +66,7 @@ fprintf(fichier, "id:capacite:conso_ttl\n");
 //Fichier de sortie des résultats
 ecrireStation(AVL,fichier);
 fclose(fichier);
+printf("hello\n");
 
 return 0;
 }
