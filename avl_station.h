@@ -38,5 +38,4 @@ int verifFilsGauche(Arbre *a, int max);
 int estABR(Arbre *a);
 int estEquilibre(Arbre *a);
 int estAVL(Arbre *a);
-double somme(Arbre *a);
 void ecrireStation(Arbre *a, FILE *fichier);
