@@ -53,7 +53,7 @@ fclose(f);
 
 //Vérifier si l'arbre est bien un AVL
 if(estAVL(AVL)==0){
-	printf("\nStructure AVL incorect\n");
+	printf("\nStructure AVL incorrect\n");
 	return 1;
 }
 
