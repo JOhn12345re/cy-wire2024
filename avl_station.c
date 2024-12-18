@@ -177,6 +177,7 @@ Arbre *insertionAVL(Arbre *a, Station stat, int *h){
 	else if(stat.id > a->s.id){
 		a->fd=insertionAVL(a->fd, stat, h);
 	}
+	//Additionne les consommations pour les stations avec les mêmes identifiants
 	else if(stat.id == a->s.id){
 		a->s.conso+=stat.conso;
 		
@@ -246,6 +247,7 @@ int estABR(Arbre *a){
 }
 
 //chatgpt
+//Equilibre l'arbre avec tous ses sours arbres 
 int estEquilibre(Arbre *a){
 	if(a==NULL){
 		return 1;
@@ -262,14 +264,6 @@ int estAVL(Arbre *a){
 		return 1;
 	}
 	return 0;
-}
-
-//Somme de l'ensemble des noeuds de l'arbre
-double somme(Arbre *a){
-	if (a==NULL){
-		return 0;
-	}
-	return a->s.conso+somme(a->fg)+somme(a->fd);
 }
 
 //Ecris dans un fichier les données de chaque station stocké dans un arbre
