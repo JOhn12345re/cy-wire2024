@@ -13,3 +13,4 @@ exec : main.o avl_station.o
 
 clean :
 	rm -f *.o
+	rm -f exec
