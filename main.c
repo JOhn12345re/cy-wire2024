@@ -66,7 +66,6 @@ fprintf(fichier, "id:capacite:conso_ttl\n");
 //Fichier de sortie des résultats
 ecrireStation(AVL,fichier);
 fclose(fichier);
-printf("hello\n");
 
 return 0;
 }
