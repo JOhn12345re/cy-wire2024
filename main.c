@@ -1,7 +1,6 @@
 //Appelle du fichier.h "avl_station.h" du programme "avl_station.c"
 #include "avl_station.h"
 
-
 int main(int argc, char ** argv){
 
 FILE* f=NULL;
