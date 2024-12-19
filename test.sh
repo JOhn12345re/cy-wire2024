@@ -2,6 +2,16 @@
 
 # Fonction pour afficher l'aide
 afficher_aide() {
+
+  echo " "
+
+  echo -e "                                   |   _   _
+                             \033[5;33m.\033[0m | \033[5;33m.\033[0m x \033[5;33m.\033[0m|\033[5;33m.\033[0m|-|\033[5;33m.\033[0m|
+                          |\ \033[5;33m.\033[0m/\033[5;33m.\033[0m\-/\033[5;33m.\033[0m\-|\033[5;33m.\033[0m|\033[5;33m.\033[0m|\033[5;33m.\033[0m|
+                       ~~~|\033[5;33m.\033[0m|_|\033[5;33m.\033[0m|_|\033[5;33m.\033[0m|\033[5;33m.\033[0m|\033[5;33m.\033[0m|_|\033[5;33m.\033[0m|~~~"
+
+  echo " "
+
   echo "Usage: $0 <chemin_csv> <type_station> <type_consommateur> [identifiant_centrale]"
   echo
   echo "Options :"
