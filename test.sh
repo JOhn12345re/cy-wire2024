@@ -2,16 +2,7 @@
 
 # Fonction pour afficher l'aide
 afficher_aide() {
-
   echo " "
-
-  echo -e "                                   |   _   _
-                             \033[5;33m.\033[0m | \033[5;33m.\033[0m x \033[5;33m.\033[0m|\033[5;33m.\033[0m|-|\033[5;33m.\033[0m|
-                          |\ \033[5;33m.\033[0m/\033[5;33m.\033[0m\-/\033[5;33m.\033[0m\-|\033[5;33m.\033[0m|\033[5;33m.\033[0m|\033[5;33m.\033[0m|
-                       ~~~|\033[5;33m.\033[0m|_|\033[5;33m.\033[0m|_|\033[5;33m.\033[0m|\033[5;33m.\033[0m|\033[5;33m.\033[0m|_|\033[5;33m.\033[0m|~~~"
-
-  echo " "
-
   echo "Usage: $0 <chemin_csv> <type_station> <type_consommateur> [identifiant_centrale]"
   echo
   echo "Options :"
@@ -25,7 +16,7 @@ afficher_aide() {
   exit 0
 }
 
-# Vérifier si l'option -h est présente parmi les arguments
+# Vérifier si l'option -h est présente
 for arg in "$@"; do
   if [[ "$arg" == "-h" ]]; then
     afficher_aide
@@ -43,7 +34,7 @@ fi
 CHEMIN_CSV=$1
 TYPE_STATION=$2
 TYPE_CONSOMMATEUR=$3
-CENTRALE_ID=${4:-""}  # Facultatif
+CENTRALE_ID=${4:-""}
 
 # Validation des paramètres
 if [[ "$TYPE_STATION" != "hvb" && "$TYPE_STATION" != "hva" && "$TYPE_STATION" != "lv" ]]; then
@@ -61,41 +52,11 @@ if [[ ! -f "$CHEMIN_CSV" ]]; then
   exit 1
 fi
 
-# Compiler le programme C avec le Makefile
-echo "Compilation du programme C..."
-make clean
-make
-if [[ $? -ne 0 ]]; then
-  echo "Erreur : Échec de la compilation du programme C."
-  exit 1
-fi
+# Variable pour stocker le fichier de sortie
+FICHIER_SORTIE="resultat_intermediaire.txt"
 
-# Lancer le programme C
-echo "Lancement du programme C avec les données du fichier CSV..."
-./exec "$CHEMIN_CSV"
-if [[ $? -ne 0 ]]; then
-  echo "Erreur : Le programme C a rencontré un problème lors de l'exécution."
-  exit 1
-fi
-
-# Création du dossier temporaire
-TMP_DIR="./tmp"
-if [[ -d "$TMP_DIR" ]]; then
-  echo "Le dossier temporaire $TMP_DIR existe déjà."
-else
-  mkdir "$TMP_DIR"
-  echo "Le dossier temporaire $TMP_DIR a été créé."
-fi
-
-# Demander si l'utilisateur souhaite supprimer les fichiers existants dans le dossier tmp
-echo "Souhaitez-vous supprimer les fichiers existants dans le dossier $TMP_DIR ? (o/n)"
-read -r REPONSE
-if [[ "$REPONSE" == "o" || "$REPONSE" == "O" ]]; then
-  rm -f "$TMP_DIR"/*
-  echo "Tous les fichiers dans $TMP_DIR ont été supprimés."
-fi
-
-# Traitement pour HVA COMP
+# Traitement selon les options
+echo "Traitement des données en cours..."
 if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
   awk -F";" -v centrale="$CENTRALE_ID" '
     NR > 1 { 
@@ -107,12 +68,8 @@ if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
                 print $3, $7, $8;
             }
         }
-    }' "$CHEMIN_CSV" > "$TMP_DIR/hva_comp_filtered.txt"
-  echo "Résultats sauvegardés dans $TMP_DIR/hva_comp_filtered.txt"
-fi
-
-# Traitement pour HVB COMP
-if [[ "$TYPE_STATION" == "hvb" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
+    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
+elif [[ "$TYPE_STATION" == "hvb" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
   awk -F";" -v centrale="$CENTRALE_ID" '
     NR > 1 {
         if (centrale == "" || $1 == centrale) {
@@ -123,12 +80,8 @@ if [[ "$TYPE_STATION" == "hvb" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
                 print $2, $7, $8;
             }
         }
-    }' "$CHEMIN_CSV" > "$TMP_DIR/hvb_comp_filtered.txt"
-  echo "Résultats sauvegardés dans $TMP_DIR/hvb_comp_filtered.txt"
-fi
-
-# Traitement pour LV ALL
-if [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "all" ]]; then
+    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
+elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "all" ]]; then
   awk -F";" -v centrale="$CENTRALE_ID" '
     NR > 1 {
         if (centrale == "" || $1 == centrale) {
@@ -137,9 +90,30 @@ if [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "all" ]]; then
                 print $4, $7, $8;
             }
         }
-    }' "$CHEMIN_CSV" > "$TMP_DIR/lv_all_filtered.txt"
-  echo "Résultats sauvegardés dans $TMP_DIR/lv_all_filtered.txt"
+    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
+fi
+
+# Vérification si un fichier de sortie a été créé
+if [[ ! -f "$FICHIER_SORTIE" ]]; then
+  echo "Erreur : Aucun fichier de sortie généré."
+  exit 1
+fi
+
+# Compilation
+echo "Compilation du programme C..."
+make clean
+make
+if [[ $? -ne 0 ]]; then
+  echo "Erreur : Échec de la compilation du programme C."
+  exit 1
+fi
+
+# Lancer le programme C avec le fichier de sortie
+echo "Lancement du programme C avec le fichier de sortie : $FICHIER_SORTIE"
+./exec "$FICHIER_SORTIE"
+if [[ $? -ne 0 ]]; then
+  echo "Erreur : Le programme C a rencontré un problème lors de l'exécution."
+  exit 1
 fi
 
 echo "Traitement terminé."
-
