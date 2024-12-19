@@ -1,4 +1,4 @@
-//Appele du fichier.h "avl_station.h" du programme "avl_station.c"
+//Appelle du fichier.h "avl_station.h" du programme "avl_station.c"
 #include "avl_station.h"
 
 
@@ -11,6 +11,7 @@ int h;
 int ligne;
 char c;
 
+//Vérifie si le nombre d'arguments est incorrecte, si oui, elle renvoie un message d'erreur et sort du programme
 if (argc < 2) {
         couleur("31");  // Texte rouge pour les erreurs
         printf("Erreur : Nombre insuffisant d'arguments.\n");
@@ -22,7 +23,7 @@ if (argc < 2) {
 // Ouverture du fichier en parametre
 f=fopen(argv[1],"r+");
 
-// Message d'erreur si le fichier est NULL
+// Message d'erreur si le fichier est NULL, donc n'existe pas
 if (f == NULL) {
         couleur("31");
         printf("\nImpossible d'ouvrir le fichier %s.\n", argv[1]);
@@ -30,6 +31,7 @@ if (f == NULL) {
         return 1;
 }
 
+// Message d'erreur si le fichier est vide
 if (testSiFichierVide(f)) {
         couleur("33");  // Texte jaune pour avertissement
         printf("Le fichier %s est vide !\n", argv[1]);
@@ -49,7 +51,7 @@ while((c = fgetc(f)) != EOF){
     }
 rewind(f);
 
-//Création de AVL
+//Création de l'AVL
 for(int i = 0; i<ligne; i++){
 //printf("Erreur de lecture de la ligne : %s\n", ligne);
 	if(fscanf(f, "%d %ld %ld\n", &s.id, &s.capacite,&s.conso)!=3){
@@ -63,7 +65,7 @@ for(int i = 0; i<ligne; i++){
 fclose(f);
 
 
-//Vérifier si l'arbre est bien un AVL
+//Vérifie si l'arbre est bien un AVL, si non, renvoie un message d'erreur
 if (!estAVL(AVL)) {
         couleur("31");
         printf("\nStructure AVL incorrecte.\n");
@@ -74,7 +76,7 @@ if (!estAVL(AVL)) {
 
 
 //Création du fichier.txt de sortie
-// Chemin du fichier de sortie dans /tmp
+//Chemin du fichier de sortie dans /tmp
 
     // Création du fichier de sortie
 FILE *fichier = fopen("resultat.txt", "w");
