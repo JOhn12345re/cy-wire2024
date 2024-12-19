@@ -16,7 +16,9 @@ if (argc < 2) {
         couleur("31");  // Texte rouge pour les erreurs
         printf("Erreur : Nombre insuffisant d'arguments.\n");
         couleur("0");  // Réinitialisation de la couleur
+        couleur("34");  // Texte rouge pour les erreurs
         printf("Usage: %s <chemin_fichier_txt>\n", argv[0]);
+        couleur("0");  // Réinitialisation de la couleur
         return 1;
 }
 
@@ -54,11 +56,12 @@ rewind(f);
 //Création de l'AVL
 for(int i = 0; i<ligne; i++){
 //printf("Erreur de lecture de la ligne : %s\n", ligne);
-	if(fscanf(f, "%d %ld %ld\n", &s.id, &s.capacite,&s.conso)!=3){
+	if(fscanf(f, "%d %ld %ld\n", &s.id, &s.capacite,&s.conso) != 3){
+		couleur("31");
 		printf("\nNombre de variable incorrect\n");
+		couleur("0");
 		return 1;
 	}
-        
         // Insérer les données dans l'AVL
 	AVL = insertionAVL(AVL,s,&h);
 }
