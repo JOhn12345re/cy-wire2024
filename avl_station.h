@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+// Permet d'ajouter de la couleur aux textes
 #define couleur(param) printf("\033[%sm",param)
 
-//Structures
+//Structure d'une station
 typedef struct station{
 	int id;
 	long capacite;
 	long conso;
 }Station;
 
+//Structure d'un arbre AVL
 typedef struct arbre{
 	Station s;
 	int eq;
