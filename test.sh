@@ -59,7 +59,7 @@ FICHIER_SORTIE="resultat_intermediaire.txt"
 echo "Traitement des données en cours..."
 if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
   awk -F";" -v centrale="$CENTRALE_ID" '
-    NR > 1 { 
+    NR > 1 {
         if (centrale == "" || $1 == centrale) {
             if ($3 != "-" && $4 == "-" && $6 == "-") {
                 gsub("-", "0", $3);
@@ -91,11 +91,36 @@ elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "all" ]]; then
             }
         }
     }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
+elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "indiv" ]]; then
+  awk -F";" -v centrale="$CENTRALE_ID" '
+    NR > 1 {
+        if (centrale == "" || $1 == centrale) {
+            if ($4 != "-" && $5 == "-") {
+                gsub("-", "0", $0);
+                print $4, $7, $8;
+                
+            }
+        }
+    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
+    elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
+  awk -F";" -v centrale="$CENTRALE_ID" '
+    NR > 1 {
+        if (centrale == "" || $1 == centrale) {
+            if ($4 != "-" && $6 == "-") {
+                gsub("-", "0", $0);
+                print $4, $7, $8;
+                
+            }
+        }
+    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
+else
+  echo "Erreur : Configuration non prise en charge."
+  exit 1
 fi
 
 # Vérification si un fichier de sortie a été créé
-if [[ ! -f "$FICHIER_SORTIE" ]]; then
-  echo "Erreur : Aucun fichier de sortie généré."
+if [[ ! -s "$FICHIER_SORTIE" ]]; then
+  echo "Erreur : Aucun fichier de sortie généré ou fichier vide."
   exit 1
 fi
 
@@ -117,3 +142,4 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo "Traitement terminé."
+
