@@ -51,11 +51,44 @@ if [[ ! -f "$CHEMIN_CSV" ]]; then
   exit 1
 fi
 
+# Compiler le programme C avec le Makefile
+echo "Compilation du programme C..."
+make clean
+make
+if [[ $? -ne 0 ]]; then
+  echo "Erreur : Échec de la compilation du programme C."
+  exit 1
+fi
+
+# Lancer le programme C
+echo "Lancement du programme C avec les données du fichier CSV..."
+./exec "$CHEMIN_CSV"
+if [[ $? -ne 0 ]]; then
+  echo "Erreur : Le programme C a rencontré un problème lors de l'exécution."
+  exit 1
+fi
+
+# Création du dossier temporaire
+TMP_DIR="./tmp"
+if [[ -d "$TMP_DIR" ]]; then
+  echo "Le dossier temporaire $TMP_DIR existe déjà."
+else
+  mkdir "$TMP_DIR"
+  echo "Le dossier temporaire $TMP_DIR a été créé."
+fi
+
+# Demander si l'utilisateur souhaite supprimer les fichiers existants dans le dossier tmp
+echo "Souhaitez-vous supprimer les fichiers existants dans le dossier $TMP_DIR ? (o/n)"
+read -r REPONSE
+if [[ "$REPONSE" == "o" || "$REPONSE" == "O" ]]; then
+  rm -f "$TMP_DIR"/*
+  echo "Tous les fichiers dans $TMP_DIR ont été supprimés."
+fi
+
 # Traitement pour HVA COMP
 if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
   awk -F";" -v centrale="$CENTRALE_ID" '
     NR > 1 { 
-        # Filtrer si centrale est spécifiée, sinon traiter toutes les lignes
         if (centrale == "" || $1 == centrale) {
             if ($3 != "-" && $4 == "-" && $6 == "-") {
                 gsub("-", "0", $3);
@@ -64,8 +97,8 @@ if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
                 print $3, $7, $8;
             }
         }
-    }' "$CHEMIN_CSV" > hva_comp_filtered.txt
-  echo "Résultats sauvegardés dans hva_comp_filtered.txt"
+    }' "$CHEMIN_CSV" > "$TMP_DIR/hva_comp_filtered.txt"
+  echo "Résultats sauvegardés dans $TMP_DIR/hva_comp_filtered.txt"
 fi
 
 # Traitement pour HVB COMP
@@ -80,8 +113,8 @@ if [[ "$TYPE_STATION" == "hvb" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
                 print $2, $7, $8;
             }
         }
-    }' "$CHEMIN_CSV" > hvb_comp_filtered.txt
-  echo "Résultats sauvegardés dans hvb_comp_filtered.txt"
+    }' "$CHEMIN_CSV" > "$TMP_DIR/hvb_comp_filtered.txt"
+  echo "Résultats sauvegardés dans $TMP_DIR/hvb_comp_filtered.txt"
 fi
 
 # Traitement pour LV ALL
@@ -94,8 +127,8 @@ if [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "all" ]]; then
                 print $4, $7, $8;
             }
         }
-    }' "$CHEMIN_CSV" > lv_all_filtered.txt
-  echo "Résultats sauvegardés dans lv_all_filtered.txt"
+    }' "$CHEMIN_CSV" > "$TMP_DIR/lv_all_filtered.txt"
+  echo "Résultats sauvegardés dans $TMP_DIR/lv_all_filtered.txt"
 fi
 
 echo "Traitement terminé."
