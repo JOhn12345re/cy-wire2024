@@ -55,7 +55,7 @@ rewind(f);
 //Création de l'AVL
 for(int i = 0; i<ligne; i++){
 //printf("Erreur de lecture de la ligne : %s\n", ligne);
-	if(fscanf(f, "%d %ld %ld\n", &s.id, &s.capacite,&s.conso) != 3){
+	if(fscanf(f, "%d %ld %ld", &s.id, &s.capacite,&s.conso) != 3){
 		couleur("31");
 		printf("\nNombre de variable incorrect\n");
 		couleur("0");
