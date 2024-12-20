@@ -15,7 +15,15 @@ afficher_aide() {
   echo "  $0 ./data.csv hva comp 2"
   exit 0
 }
-
+ 
+if [ -d "input" ]; then
+    echo "existe déjà"
+else
+    mkdir input
+    echo "Le dossier 'input' a été créé."
+fi
+	
+ 
 # Vérifier si l'option -h est présente
 for arg in "$@"; do
   if [[ "$arg" == "-h" ]]; then
@@ -31,7 +39,7 @@ if [[ $# -lt 3 ]]; then
 fi
 
 # Paramètres
-CHEMIN_CSV=$1
+CHEMIN_CSV=input/$1
 TYPE_STATION=$2
 TYPE_CONSOMMATEUR=$3
 CENTRALE_ID=${4:-""}
@@ -52,94 +60,85 @@ if [[ ! -f "$CHEMIN_CSV" ]]; then
   exit 1
 fi
 
+# Gestion du dossier tmp
+TMP_DIR="tmp"
+
+if [[ -d "$TMP_DIR" ]]; then
+  echo "Le dossier '$TMP_DIR' existe déjà."
+  # Vérifier s'il y a des fichiers à l'intérieur
+  if [[ "$(ls -A $TMP_DIR)" ]]; then
+    echo "Suppression des fichiers à l'intérieur de '$TMP_DIR'..."
+    rm -f "$TMP_DIR"/*
+    if [[ $? -ne 0 ]]; then
+      echo "Erreur : Impossible de supprimer les fichiers dans '$TMP_DIR'."
+      exit 1
+    fi
+    echo "Les fichiers ont été supprimés."
+  else
+    echo "Le dossier '$TMP_DIR' est déjà vide."
+  fi
+else
+  echo "Création du dossier '$TMP_DIR'..."
+  mkdir "$TMP_DIR"
+  if [[ $? -ne 0 ]]; then
+    echo "Erreur : Impossible de créer le dossier '$TMP_DIR'."
+    exit 1
+  fi
+  echo "Le dossier '$TMP_DIR' a été créé."
+fi
+
 # Variable pour stocker le fichier de sortie
-FICHIER_SORTIE="resultat_intermediaire.txt"
+avant_c="$TMP_DIR/resultat_intermediaire.txt"
 
 # Traitement selon les options
 echo "Traitement des données en cours..."
-if [[ "$TYPE_STATION" == "hva" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
-  awk -F";" -v centrale="$CENTRALE_ID" '
-    NR > 1 {
-        if (centrale == "" || $1 == centrale) {
-            if ($3 != "-" && $4 == "-" && $6 == "-") {
-                gsub("-", "0", $3);
-                gsub("-", "0", $7);
-                gsub("-", "0", $8);
-                print $3, $7, $8;
-            }
+awk -F";" -v centrale="$CENTRALE_ID" -v type_station="$TYPE_STATION" -v type_consommateur="$TYPE_CONSOMMATEUR" '
+NR > 1 {
+    if (centrale == "" || $1 == centrale) {
+        gsub("-", "0", $0);
+        if (type_station == "hva" && type_consommateur == "comp" && $3 != "0" && $4 == "0" && $6 == "0") {
+            print $3, $7, $8;
+        } else if (type_station == "hvb" && type_consommateur == "comp" && $2 != "0" && $3 == "0" && $4 == "0" && $6 == "0") {
+            print $2, $7, $8;
+        } else if (type_station == "lv" && type_consommateur == "all" && $4 != "0") {
+            print $4, $7, $8;
+        } else if (type_station == "lv" && type_consommateur == "indiv" && $4 != "0" && $5 == "0") {
+            print $4, $7, $8;
+        } else if (type_station == "lv" && type_consommateur == "comp" && $4 != "0" && $6 == "0") {
+            print $4, $7, $8;
         }
-    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
-elif [[ "$TYPE_STATION" == "hvb" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
-  awk -F";" -v centrale="$CENTRALE_ID" '
-    NR > 1 {
-        if (centrale == "" || $1 == centrale) {
-            if ($2 != "-" && $3 == "-" && $4 == "-" && $6 == "-") {
-                gsub("-", "0", $2);
-                gsub("-", "0", $7);
-                gsub("-", "0", $8);
-                print $2, $7, $8;
-            }
-        }
-    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
-elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "all" ]]; then
-  awk -F";" -v centrale="$CENTRALE_ID" '
-    NR > 1 {
-        if (centrale == "" || $1 == centrale) {
-            gsub("-", "0", $0);
-            if ($4 != "0") {
-                print $4, $7, $8;
-            }
-        }
-    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
-elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "indiv" ]]; then
-  awk -F";" -v centrale="$CENTRALE_ID" '
-    NR > 1 {
-        if (centrale == "" || $1 == centrale) {
-            if ($4 != "-" && $5 == "-") {
-                gsub("-", "0", $0);
-                print $4, $7, $8;
-                
-            }
-        }
-    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
-    elif [[ "$TYPE_STATION" == "lv" && "$TYPE_CONSOMMATEUR" == "comp" ]]; then
-  awk -F";" -v centrale="$CENTRALE_ID" '
-    NR > 1 {
-        if (centrale == "" || $1 == centrale) {
-            if ($4 != "-" && $6 == "-") {
-                gsub("-", "0", $0);
-                print $4, $7, $8;
-                
-            }
-        }
-    }' "$CHEMIN_CSV" > "$FICHIER_SORTIE"
-else
-  echo "Erreur : Configuration non prise en charge."
-  exit 1
-fi
+    }
+}' "$CHEMIN_CSV" > "$avant_c"
 
 # Vérification si un fichier de sortie a été créé
-if [[ ! -s "$FICHIER_SORTIE" ]]; then
+if [[ ! -s "$avant_c" ]]; then
   echo "Erreur : Aucun fichier de sortie généré ou fichier vide."
   exit 1
 fi
 
 # Compilation
 echo "Compilation du programme C..."
-make clean
-make
+make clean && make
 if [[ $? -ne 0 ]]; then
   echo "Erreur : Échec de la compilation du programme C."
   exit 1
 fi
 
 # Lancer le programme C avec le fichier de sortie
-echo "Lancement du programme C avec le fichier de sortie : $FICHIER_SORTIE"
-./exec "$FICHIER_SORTIE"
+echo "Lancement du programme C avec le fichier de sortie : $avant_c"
+./exec "$avant_c"
 if [[ $? -ne 0 ]]; then
   echo "Erreur : Le programme C a rencontré un problème lors de l'exécution."
   exit 1
 fi
 
-echo "Traitement terminé."
+# Création du répertoire de sortie
+mkdir -p output
+
+# Tri et enregistrement des résultats finaux
+sort -t ':'  -k2,2n resultat.txt > output/"${TYPE_STATION}_${TYPE_CONSOMMATEUR}.csv"
+echo "Traitement terminé. Les résultats sont disponibles dans output/${TYPE_STATION}_${TYPE_CONSOMMATEUR}.csv"
+
+  
+
 
