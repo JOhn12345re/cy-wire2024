@@ -3,32 +3,33 @@
 # Fonction pour afficher l'aide
 afficher_aide() {
   echo " "
-  echo "Usage: $0 <chemin_csv> <type_station> <type_consommateur> [identifiant_centrale]"
+  echo "Usage: $0 <nom_fichier> <type_station> <type_consommateur> [identifiant_centrale]"
   echo
   echo "Options :"
-  echo "  <chemin_csv>         Chemin du fichier CSV contenant les données."
+  echo "  <nom_fichier>        Nom du fichier CSV situé dans le dossier 'input'."
   echo "  <type_station>       Type de station à traiter (hvb, hva, lv)."
   echo "  <type_consommateur>  Type de consommateur (comp, indiv, all)."
   echo "  [identifiant_centrale] (Optionnel) Identifiant de la centrale spécifique à analyser."
   echo
   echo "Exemple :"
-  echo "  $0 ./data.csv hva comp 2"
+  echo "  $0 data.csv hva comp 2"
   exit 0
 }
- 
-if [ -d "input" ]; then
-    echo "existe déjà"
+
+# Création du dossier "input" s'il n'existe pas
+if [[ ! -d "input" ]]; then
+  mkdir input
+  echo "Le dossier 'input' a été créé."
 else
-    mkdir input
-    echo "Le dossier 'input' a été créé."
+  echo "Le dossier 'input' existe déjà."
 fi
-	
- 
+
 # Vérifier si l'option -h est présente
 for arg in "$@"; do
   if [[ "$arg" == "-h" ]]; then
     afficher_aide
   fi
+
 done
 
 # Validation des paramètres obligatoires
@@ -39,58 +40,54 @@ if [[ $# -lt 3 ]]; then
 fi
 
 # Paramètres
-CHEMIN_CSV=input/$1
-TYPE_STATION=$2
-TYPE_CONSOMMATEUR=$3
+NOM_FICHIER="$1"
+CHEMIN_CSV="input/$NOM_FICHIER"
+TYPE_STATION="$2"
+TYPE_CONSOMMATEUR="$3"
 CENTRALE_ID=${4:-""}
 
-# Validation des paramètres
-if [[ "$TYPE_STATION" != "hvb" && "$TYPE_STATION" != "hva" && "$TYPE_STATION" != "lv" ]]; then
-  echo "Erreur : Type de station invalide. Valeurs possibles : hvb, hva, lv."
-  exit 1
-fi
-
-if [[ "$TYPE_CONSOMMATEUR" != "comp" && "$TYPE_CONSOMMATEUR" != "indiv" && "$TYPE_CONSOMMATEUR" != "all" ]]; then
-  echo "Erreur : Type de consommateur invalide. Valeurs possibles : comp, indiv, all."
-  exit 1
-fi
-
+# Vérification de l'existence du fichier CSV dans "input"
 if [[ ! -f "$CHEMIN_CSV" ]]; then
-  echo "Erreur : Fichier CSV introuvable : $CHEMIN_CSV"
+  echo "Erreur : Le fichier $NOM_FICHIER n'existe pas dans le dossier 'input'."
   exit 1
 fi
 
-# Gestion du dossier tmp
+# Suppression ou conservation du contenu du dossier tmp
 TMP_DIR="tmp"
+RESULT_DIR="resultat"
+OUTPUT_DIR="output"
 
 if [[ -d "$TMP_DIR" ]]; then
-  echo "Le dossier '$TMP_DIR' existe déjà."
-  # Vérifier s'il y a des fichiers à l'intérieur
-  if [[ "$(ls -A $TMP_DIR)" ]]; then
-    echo "Suppression des fichiers à l'intérieur de '$TMP_DIR'..."
-    rm -f "$TMP_DIR"/*
-    if [[ $? -ne 0 ]]; then
-      echo "Erreur : Impossible de supprimer les fichiers dans '$TMP_DIR'."
-      exit 1
-    fi
-    echo "Les fichiers ont été supprimés."
+  echo -n "Voulez-vous effacer le contenu du dossier 'tmp' ? (o/n) : "
+  read reponse
+  if [[ "$reponse" == "o" || "$reponse" == "O" ]]; then
+    rm -rf "$TMP_DIR"/*
+    echo "Le contenu du dossier 'tmp' a été supprimé."
   else
-    echo "Le dossier '$TMP_DIR' est déjà vide."
+    echo "Le contenu du dossier 'tmp' a été conservé."
   fi
 else
-  echo "Création du dossier '$TMP_DIR'..."
   mkdir "$TMP_DIR"
-  if [[ $? -ne 0 ]]; then
-    echo "Erreur : Impossible de créer le dossier '$TMP_DIR'."
-    exit 1
-  fi
-  echo "Le dossier '$TMP_DIR' a été créé."
+  echo "Le dossier 'tmp' a été créé."
 fi
 
-# Variable pour stocker le fichier de sortie
-avant_c="$TMP_DIR/resultat_intermediaire.txt"
+# Gestion des dossiers output et resultat
+if [[ -d "$OUTPUT_DIR" && $(ls -A "$OUTPUT_DIR") ]]; then
+  mkdir -p "$RESULT_DIR"
+  mv "$OUTPUT_DIR"/* "$RESULT_DIR"/
+  echo "Les fichiers existants du dossier 'output' ont été déplacés vers '$RESULT_DIR'."
+else
+  mkdir -p "$OUTPUT_DIR"
+  echo "Le dossier 'output' est prêt pour les nouveaux fichiers."
+fi
 
-# Traitement selon les options
+# Début du chronomètre
+debut=$(date +%s)
+
+# Variable pour stocker le fichier de sortie
+SORTIE_INTERMEDIAIRE="$TMP_DIR/resultat_intermediaire.txt"
+
+# Traitement des données avec awk
 echo "Traitement des données en cours..."
 awk -F";" -v centrale="$CENTRALE_ID" -v type_station="$TYPE_STATION" -v type_consommateur="$TYPE_CONSOMMATEUR" '
 NR > 1 {
@@ -108,37 +105,46 @@ NR > 1 {
             print $4, $7, $8;
         }
     }
-}' "$CHEMIN_CSV" > "$avant_c"
+}' "$CHEMIN_CSV" > "$SORTIE_INTERMEDIAIRE"
 
-# Vérification si un fichier de sortie a été créé
-if [[ ! -s "$avant_c" ]]; then
+if [[ ! -s "$SORTIE_INTERMEDIAIRE" ]]; then
   echo "Erreur : Aucun fichier de sortie généré ou fichier vide."
+  debut=0
   exit 1
 fi
 
-# Compilation
-echo "Compilation du programme C..."
+# Compilation du programme C
 make clean && make
 if [[ $? -ne 0 ]]; then
   echo "Erreur : Échec de la compilation du programme C."
+  debut=0
   exit 1
 fi
 
-# Lancer le programme C avec le fichier de sortie
-echo "Lancement du programme C avec le fichier de sortie : $avant_c"
-./exec "$avant_c"
+# Exécution du programme C
+./exec "$SORTIE_INTERMEDIAIRE"
 if [[ $? -ne 0 ]]; then
   echo "Erreur : Le programme C a rencontré un problème lors de l'exécution."
+  debut=0
   exit 1
 fi
 
-# Création du répertoire de sortie
-mkdir -p output
+# Déplacement de resultat.txt vers tmp
+if [[ -f "resultat.txt" ]]; then
+  mv resultat.txt "$TMP_DIR/"
+  echo "Le fichier resultat.txt a été déplacé vers le dossier 'tmp'."
+fi
 
-# Tri et enregistrement des résultats finaux
-sort -t ':'  -k2,2n resultat.txt > output/"${TYPE_STATION}_${TYPE_CONSOMMATEUR}.csv"
-echo "Traitement terminé. Les résultats sont disponibles dans output/${TYPE_STATION}_${TYPE_CONSOMMATEUR}.csv"
+# Calcul du temps écoulé
+fin=$(date +%s)
+temps_execution=$((fin - debut))
 
-  
+# Enregistrement des résultats finaux dans output
+sort -t ':' -k2,2n "$TMP_DIR/resultat.txt" > "$OUTPUT_DIR/${TYPE_STATION}_${TYPE_CONSOMMATEUR}.csv"
 
+if [[ $debut -ne 0 ]]; then
+  echo "Traitement terminé en $temps_execution secondes. Les résultats sont disponibles dans '$OUTPUT_DIR/${TYPE_STATION}_${TYPE_CONSOMMATEUR}.csv'"
+else
+  echo "Le temps d'exécution a été réinitialisé à 0 à cause d'une erreur."
+fi
 
