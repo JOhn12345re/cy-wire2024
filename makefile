@@ -1,5 +1,4 @@
-// 'make' pour compiler tous les fichiers
-// 'make clean' pour effacer les fichiers sortants
+
 
 all: exec
 
