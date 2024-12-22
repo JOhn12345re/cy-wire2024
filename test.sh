@@ -4,7 +4,13 @@
 afficher_aide() {
   echo " "
   echo "Usage: $0 <nom_fichier> <type_station> <type_consommateur> [identifiant_centrale]"
-  echo
+  echo " "
+  echo -e "            |   _   _
+      \033[1;33;5m.\033[0m | \033[1;33;5m.\033[0m x \033[1;33;5m.\033[0m|\033[1;33;5m.\033[0m|-|\033[1;33;5m.\033[0m|
+   |\ \033[1;33;5m.\033[0m/\033[1;33;5m.\033[0m\-/\033[1;33;5m.\033[0m\-|\033[1;33;5m.\033[0m|\033[1;33;5m.\033[0m|\033[1;33;5m.\033[0m|
+~~~|\033[1;33;5m.\033[0m|_|\033[1;33;5m.\033[0m|_|\033[1;33;5m.\033[0m|\033[1;33;5m.\033[0m|\033[1;33;5m.\033[0m|_|\033[1;33;5m.\033[0m|~~~
+"
+  echo " "
   echo "Options :"
   echo "  <nom_fichier>        Nom du fichier CSV situé dans le dossier 'input'."
   echo "  <type_station>       Type de station à traiter (hvb, hva, lv)."
