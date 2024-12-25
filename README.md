@@ -156,12 +156,3 @@ output/hva_comp.csv
 
 ---
 
-## Licence
-
-Ce projet est sous licence MIT. Consultez le fichier `LICENSE` pour plus d'informations.
-
----
-
-## Contact
-
-Pour toute question ou suggestion, ouvrez une issue ou contactez le mainteneur à <votre-email@example.com>.
